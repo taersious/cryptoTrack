@@ -1,0 +1,119 @@
+extends layout
+
+block content
+   
+  h1= title
+  p Welcome to #{title}.
+  p The current date and time is: #{currenttime}
+  section(class="get")
+  p Please provide the current price of BTC, along with the current profitability,
+    |the unpaid mining balance, the remaining time until next payout, and the total 
+    |current btc in your wallet. 
+
+  div(class="banner")
+    div(class="display")
+        input(type="text" id="dollars", name="dollars")
+    div(class="countDown")
+        input(type="text" id="countDown", name="countDown")
+  form(id="calc", action="/",method="get")
+    div(class="input")
+      label(for="BTC") BTC: 
+      input(type="text", id="BTC", name="BTC")
+      | !{' '}
+      div(class='form-align')
+        label(for="PROFIT") Profit/24H: 
+        input(type="text", id="PROFIT", name="PROFIT")
+      div(class='form-align')
+        label(for="UNPAID") Unpaid Balance:  
+        input(type="text", id="UNPAID", name="UNPAID")
+      div(class='form-align')
+        label(for="NEXTPAYOUT") Next Payout (mins): 
+        input(type="text", id="NEXTPAYOUT", name="NEXTPAYOUT")
+      div(class='form-align')
+        label(for="WALLET") Wallet Balance: 
+        input(type="text", id="WALLET", name="WALLET")
+      
+    button(type="submit") Calculate 
+    | !{'  '}
+    button(id="clearBtn", type="button") Clear
+    
+  
+  .linebreak
+  .form-answer 
+    label(for='payoutDays') Days until 0.001 balance is reached: 
+    input(type="text", id="payoutDays" name="payoutDays", class="answer" readonly='readonly')
+  .form-answer 
+    label(for='btcPerMinute') btc per minute (avg): 
+    input(type="text", id="btcPerMinute" name="btcPerMinute", class="answer" readonly='readonly')
+  .form-answer
+    label(for='dollarsPerMinute') Dollars per minute: 
+    input(type="text", id="dollarsPerMinute" name="dollarsPerMinute", class="answer" readonly='readonly')  
+  .form-answer
+    label(for='dollarsPerHour') Dollars per hour: 
+    input(type="text", id="dollarsPerHour" name="dollarsPerHour", class="answer" readonly='readonly')
+  .form-answer 
+    label(for='nextPayoutDollars') Next payout amount ($): 
+    input(type="text", id="nextPayoutDollars" name="nextPayoutDollars", class="answer" readonly='readonly')
+  .linebreak
+
+
+  div
+    if posts
+      each val in items
+        article(class="item")
+          div Title: #{val.title}
+          div Content: #{val.content}
+          div Author: #{val.author}
+          div ID: #{val._id}
+
+  div(class="linebreak")
+    a(href="/users") Users | !{'    '}
+    a(href="/error") Error
+
+  script
+      | let x = !{data}
+      | let time = x.currenttime
+      | let btc = x.btc
+      | let profit = x.profit 
+      | let payout = x.payout 
+      | let unpaid = x.unpaid 
+      | let wallet = x.wallet
+      | let payoutDays = x.payoutDays
+      | let btcPerMinute = x.btcPerMinute
+      | let dollarsPerMinute = x.dollarsPerMinute
+      | let dollarsPerHour = x.dollarsPerHour
+      | let dollars = x.dollars
+      | let countDown = x.countDown
+      | let nextPayoutDollars = x.nextPayoutDollars
+      | document.getElementById("BTC").value = btc
+      | document.getElementById("PROFIT").value = profit
+      | document.getElementById("UNPAID").value = unpaid
+      | document.getElementById("NEXTPAYOUT").value = payout
+      | document.getElementById("WALLET").value = wallet
+      | document.getElementById("payoutDays").value = payoutDays
+      | document.getElementById("btcPerMinute").value = btcPerMinute
+      | document.getElementById("dollarsPerMinute").value = dollarsPerMinute
+      | document.getElementById("dollarsPerHour").value = dollarsPerHour
+      | if(dollars.trim() == "") { dollars = "0.00" }
+      | document.getElementById("dollars").value = "~ $" + dollars
+      | document.getElementById("countDown").value = countDown;
+      | document.getElementById("nextPayoutDollars").value = nextPayoutDollars
+      | document.getElementById('clearBtn').addEventListener('click', function(e) { e.preventDefault(); clear(); })
+      | function clear(){
+      |   document.getElementById("BTC").value = '';
+      |   document.getElementById("PROFIT").value = '';
+      |   document.getElementById("UNPAID").value = '';
+      |   document.getElementById("NEXTPAYOUT").value = '';
+      |   document.getElementById("WALLET").value = '';
+      |   document.getElementById("payoutDays").value = '';
+      |   document.getElementById("btcPerMinute").value = '';
+      |   document.getElementById("dollarsPerMinute").value = '';
+      |   document.getElementById("dollarsPerHour").value = '';
+      |   document.getElementById("dollars").value = '';
+      |   document.getElementById("countDown").value = '';
+      |   return false;
+      | }
+
+  #error
+    if error
+        p.text-danger Error!!!
